@@ -77,11 +77,13 @@ module ParamsVerification
     end
 
     # verify nested params, only 1 level deep tho
-    params.each_pair do |key, value|
-      if value.is_a?(Hash)
-        namespaced = service_params.namespaced_params.find{|np| np.space_name.name.to_s == key.to_s}
-        raise UnexpectedParam, "Request included unexpected parameter: #{ERB::Util.html_escape(key)}" if namespaced.nil?
-        unexpected_params?(params[key], namespaced.param_names)
+    unless ignore_unexpected
+      params.each_pair do |key, value|
+        if value.is_a?(Hash)
+          namespaced = service_params.namespaced_params.find{|np| np.space_name.name.to_s == key.to_s}
+          raise UnexpectedParam, "Request included unexpected parameter: #{ERB::Util.html_escape(key)}" if namespaced.nil?
+          unexpected_params?(params[key], namespaced.param_names)
+        end
       end
     end
 
